@@ -1,9 +1,10 @@
 const express = require('express');
-const Task = require('./models');
+const Task = require('../models/Tasks');
 const router = express.Router();
+const {authMiddleware} = require("../middleware");
 
 // 📌 Create Task (POST /tasks)
-router.post('/tasks', async (req, res) => {
+router.post('/tasks', authMiddleware, async (req, res) => {
     try {
         const task = new Task(req.body);
         await task.save();
@@ -14,7 +15,7 @@ router.post('/tasks', async (req, res) => {
 });
 
 // 📌 Get All Tasks (GET /tasks?status=Completed&priority=High)
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', authMiddleware,async (req, res) => {
     try {
         const filters = {};
         if (req.query.status) filters.status = req.query.status;
@@ -28,7 +29,7 @@ router.get('/tasks', async (req, res) => {
 });
 
 // 📌 Get Single Task (GET /tasks/:id)
-router.get('/tasks/:id', async (req, res) => {
+router.get('/tasks/:id', authMiddleware, async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ success: false, message: "Task not found" });
@@ -40,7 +41,7 @@ router.get('/tasks/:id', async (req, res) => {
 });
 
 // 📌 Update Task (PUT /tasks/:id)
-router.put('/tasks/:id', async (req, res) => {
+router.put('/tasks/:id', authMiddleware, async (req, res) => {
     try {
         const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!task) return res.status(404).json({ success: false, message: "Task not found" });
@@ -52,7 +53,7 @@ router.put('/tasks/:id', async (req, res) => {
 });
 
 // 📌 Delete Task (DELETE /tasks/:id)
-router.delete('/tasks/:id', async (req, res) => {
+router.delete('/tasks/:id', authMiddleware, async (req, res) => {
     try {
         const task = await Task.findByIdAndDelete(req.params.id);
         if (!task) return res.status(404).json({ success: false, message: "Task not found" });
