@@ -1,12 +1,13 @@
 const express = require('express');
 const Task = require('../models/Tasks');
 const router = express.Router();
-const {authMiddleware} = require("../middleware");
+const { authMiddleware } = require("../middleware");
 
 // 📌 Create Task (POST /tasks)
 router.post('/tasks', authMiddleware, async (req, res) => {
     try {
-        const task = new Task(req.body);
+        const task = new Task({ ...req.body, createdBy: req.user.userId });
+
         await task.save();
         res.status(201).json({ success: true, task });
     } catch (err) {
@@ -15,9 +16,9 @@ router.post('/tasks', authMiddleware, async (req, res) => {
 });
 
 // 📌 Get All Tasks (GET /tasks?status=Completed&priority=High)
-router.get('/tasks', authMiddleware,async (req, res) => {
+router.get('/tasks', authMiddleware, async (req, res) => {
     try {
-        const filters = {};
+        const filters = { createdBy: req.user.userId };
         if (req.query.status) filters.status = req.query.status;
         if (req.query.priority) filters.priority = req.query.priority;
 

@@ -6,7 +6,7 @@ const taskSchema = new mongoose.Schema({
   dueDate: { type: Date },
   priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Low' },
   status: { type: String, enum: ['Pending', 'Completed'], default: 'Pending' },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' } // Optional for authentication
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } // Optional for authentication
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
